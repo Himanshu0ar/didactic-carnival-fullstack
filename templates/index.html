@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+
+{% block body %}
+
+<div class="divcontainer">
+    <h1 class="text-center">Add employee data</h1>
+    <form action="/" method="post">
+      <div class="mb-3">
+        <label for="name" class="form-label">Name</label>
+        <input type="text" class="form-control" name="name" id="" placeholder="Enter full name">
+      </div>
+
+           <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input type="text" class="form-control" name="email" id="" placeholder="Enter correct email">
+      </div>
+
+           <div class="mb-3">
+        <button type="submit" class="btn btn-primary">Submit</button>
+
+      </div>
+
+    
+
+    </form>
+        
+</div>
+
+<div class = "container">
+    <h2>All Employees Data</h2>
+    <table class="table">
+  <thead>
+    <tr>
+      <th scope="col">S.No.</th>
+      <th scope="col">Name</th>
+      <th scope="col">Email</th>
+      <th scope='col'>Action</th>
+  
+    </tr>
+  </thead>
+  <tbody>
+
+{% for i in employees %}
+    <tr>
+      <th scope="row">{{i.sno}}</th>
+      <td>{{i.name}}</td>
+      <td>{{i.email}}</td>
+      <td>
+        <a href="/update"></a>
+      </td>
+    </tr>
+    {%endfor%}
+
+  </tbody>
+</table>
+</div>
+{% endblock body %}
