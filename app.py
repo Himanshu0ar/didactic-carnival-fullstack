@@ -1,26 +1,33 @@
-from flask import Flask, render_template, request, redirect #here we hve used redirect to make a new page for th4 delete one 
+from flask import Flask, flash, render_template, request, redirect #here we hve used redirect to make a new page for th4 delete one 
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///employee.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATION"] = False
+app.config["SECRET_KEY"] = "supersecretkey"
 
 db = SQLAlchemy(app)
 app.app_context().push()
 
 class Employee(db.Model):
    sno = db.Column(db.Integer, primary_key = True)
-   name = db.Column(db.String(200), nullable = False)
+   name = db.Column(db.String(200), nullable = False) #we need to remove white null space
    email = db.Column(db.String(500), nullable = False)
 
 @app.route("/", methods=['GET', 'POST'])
 def home():
    if request.method == 'POST':
       name = request.form['name']
-      email = request.form['email']
+      name= request.form['name'].strip() # to remove white space from the name from forward and backward
+      email = request.form['email'].strip() # to remove white space from the email from forward and backward
+
+      if not name or not email:
+         flash("all fields are required ", "DANGER")
       employee = Employee(name = name, email = email)
       db.session.add(employee)
       db.session.commit()
+      flash("Employee added successfully", "SUCCESS")
+      return redirect("/")
    allemployee = Employee.query.all()	
    return render_template("index.html", allemployee=allemployee)
 
@@ -34,14 +41,24 @@ def delete(sno):
     db.session.delete(employee)
     db.session.commit()
     return redirect("/")
-@app.route("/update/<int:sno>")
+@app.route("/update/<int:sno>", methods=['GET', 'POST'])
 def update(sno):
-    pass
+    if request.method=='POST':
+        name = request.form['name']
+        email = request.form['email']
+        employee = Employee.query.filter_by(sno=sno).first()
+        employee.name = name
+        employee.email = email
+        db.session.add(employee)
+        db.session.commit()
+        return redirect("/")
+
+    employee = Employee.query.filter_by(sno=sno).first()
+    return render_template("update.html", employee=employee)
 
 @app.route("/contact")
 def contact():
    return render_template("contact.html")
-
 
 if __name__ == '__main__':
    app.run(debug=True)
